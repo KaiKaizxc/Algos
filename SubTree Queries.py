@@ -1,6 +1,11 @@
 import collections
 from math import ceil, log2
 import io, os, time, sys
+
+sys.setrecursionlimit(10**7)
+input = io.BytesIO(os.read(0, \
+     os.fstat(0).st_size)).readline
+n, q = input().split()
 class segment_tree:
     # merge(left, right): function used to merge the two halves
     # basef(value): function applied on individual values
@@ -53,9 +58,7 @@ class segment_tree:
         self._update_util(0, 0, self.n - 1, x, v)
         self.array[x] = v
 
-input = io.BytesIO(os.read(0, \
-     os.fstat(0).st_size)).readline
-n, q = input().split()
+
 n = int(n)
 q = int(q)
 values = input().split()
@@ -71,21 +74,22 @@ dp = [[], [0 for i in range(n)], []]
 visited = set()
 mapper = collections.defaultdict(int)
 
-#O(N)
-def dfs(currentNode):
+#O(N) build up my dp
+def dfs(currentNode, currentValue):
     dp[0].append(currentNode)
     mapper[currentNode] = len(dp[0]) - 1
-    dp[2].append(values[currentNode - 1])
+    dp[2].append(values[currentNode - 1] + currentValue)
+
     visited.add(currentNode)
     curCount = 1
     for nei in graph[currentNode]:
         if nei not in visited:
-            curCount += dfs(nei)
+            curCount += dfs(nei,values[currentNode - 1] + currentValue)
     dp[1][mapper[currentNode]] = curCount
     return curCount
 
 
-dfs(1)
+dfs(1, 0)
 
 #O(N)
 tree = segment_tree(dp[2])
